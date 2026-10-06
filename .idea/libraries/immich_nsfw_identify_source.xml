@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="immich-nsfw-identify-source">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/immich-nsfw-identify-source.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

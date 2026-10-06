@@ -1,0 +1,35 @@
+name: immich-nsfw-identify
+services:
+  scanner:
+    build: .
+    image: immich-nsfw-identify:local
+    container_name: immich-nsfw-identify
+    ports:
+      - "127.0.0.1:${NSFW_PORT:-2983}:2983"
+    environment:
+      IMMICH_API_URL: ${IMMICH_API_URL:-http://host.docker.internal:2283/api}
+      STATE_DIR: /state
+      MODEL_DIR: /model-cache
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - nsfw-state:/state
+      - nsfw-model:/model-cache
+    restart: unless-stopped
+    cpus: 2
+    mem_limit: 2g
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:2983/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+volumes:
+  nsfw-state:
+  nsfw-model:

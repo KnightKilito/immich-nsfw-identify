@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>immich-nsfw-identify · 照片隐私审核</title><link rel="icon" type="image/svg+xml" href="/static/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png"><link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"><link rel="stylesheet" href="/static/style.css"><script defer src="/static/review-controls.js"></script><script defer src="/static/app.js"></script></head>
+<body>
+<header><div><span class="eyebrow">IMMICH-NSFW-IDENTIFY · LOCAL AI</span><h1>照片隐私审核</h1><p>先识别，再决定。照片在本机处理，原图保留在 Immich。</p></div><span id="modeBadge" class="badge">审核模式</span></header>
+<main>
+<div id="notice" role="status" hidden></div>
+<section id="setup" class="panel">
+<h2>连接你的照片库</h2><p>在 Immich 网页端打开头像 → 账号设置 → API Key，新建一个专用 Key。为它勾选以下权限：</p>
+<p class="permissions">user.read · asset.read · asset.view · asset.update · asset.share · album.read · albumAsset.create</p>
+<p class="muted">不需要删除权限。先在 Immich 配置锁定文件夹的 6 位 PIN。Key 仅保存于本机服务，页面不会回显；扫描只处理此账号自己的照片。</p>
+<form id="connectForm"><label>Immich API Key<input id="apiKey" type="password" required autocomplete="off" placeholder="粘贴专用 API Key"></label><button type="submit">验证并连接</button></form>
+<p id="connection" class="muted"></p>
+</section>
+<section class="panel">
+<div class="section-head"><h2>扫描与设置</h2><span id="modelState" class="muted">模型未加载</span></div>
+<div class="settings-grid">
+<label>待审核阈值<input id="reviewThreshold" type="number" min="0.05" max="1" step="0.01" value="0.70"></label>
+<label>自动锁定阈值<input id="autoThreshold" type="number" min="0.05" max="1" step="0.01" value="0.95"></label>
+<label>运行模式<select id="mode"><option value="review">审核：扫描后由我确认</option><option value="auto">自动：仅锁定新增高分照片</option></select></label>
+<label>定时扫描<select id="scheduled"><option value="false">关闭</option><option value="true">开启</option></select></label>
+<label>扫描间隔（分钟）<input id="interval" type="number" min="5" max="1440" value="15"></label>
+</div>
+<p class="muted">分数是模型输出，不是准确率。建议先扫描 100 张观察误判。自动模式只处理开启后上传的静态照片；视频、动画不检测，实况、相册和堆叠内照片交给你审核。</p>
+<div class="actions"><button id="saveSettings" class="secondary">保存设置</button><span class="divider"></span><select id="scanScope" aria-label="扫描范围"><option value="100">先扫描 100 张</option><option value="0">扫描整个照片库（跳过已处理）</option><option value="rescan">重新识别整个照片库</option><option value="new">增量扫描新增照片</option></select><button id="scan">开始扫描</button><button id="stop" class="secondary">停止</button></div>
+<p id="progress" class="progress">等待连接</p>
+<p class="muted">新照片上传后到被扫描之间可能暂时显示；这项服务不拦截上传。无法用自动识别保证所有敏感照片都被隐藏。</p>
+</section>
+<section class="panel">
+<div class="section-head"><h2>审核结果 <span id="resultCount" class="muted"></span></h2><select id="filter" aria-label="结果筛选"><option value="candidates">待审核候选</option><option value="all">所有结果</option><option value="locked">已锁定</option><option value="keep">人工保留</option><option value="error">处理失败</option><option value="unsupported">未检测的视频 / 动画</option><option value="uncertain">操作待确认</option></select></div>
+<div class="actions"><button id="refreshResultsButton" class="secondary">刷新结果</button><span id="resultsUpdateNotice" class="muted" aria-live="polite"></span></div>
+<div class="actions"><button id="showAllPreviews" class="secondary" aria-pressed="false">显示所有预览</button><button id="showPage" class="secondary">显示本页预览</button><button id="blurPage" class="secondary">模糊本页预览</button><span class="divider"></span><button id="selectPage" class="secondary">选择本页候选</button><button id="keep" class="secondary">保留所选</button><button id="lock">锁定所选</button><span id="selectionCount" class="muted" aria-live="polite">已选 0 张</span></div>
+<p class="muted">默认翻页后模糊；开启“显示所有预览”后跨页保持清晰，刷新浏览器恢复默认。鼠标拖拽框选，Ctrl / Command + 拖拽追加，Esc 取消。锁定会移出相册；恢复仅适用于已记录且仍有写权限的相册关系。</p>
+<div id="results" class="cards"><p class="empty">连接照片库后，先运行一次扫描。</p></div>
+<div class="pagination"><label class="inline-label">每页数量<select id="pageSize"><option value="24">24 张</option><option value="48" selected>48 张</option><option value="96">96 张</option><option value="192">192 张</option></select></label><button id="prev" class="secondary">上一页</button><span id="pageLabel" aria-live="polite"></span><button id="next" class="secondary">下一页</button><form id="jumpForm" class="jump-form"><label class="inline-label">跳转页<input id="jumpPage" type="number" min="1" value="1" required></label><button type="submit" class="secondary">跳转</button></form></div>
+</section>
+<section class="panel"><div class="section-head"><h2>锁定与恢复记录</h2><span class="muted">最近 100 次</span></div><p class="muted">恢复需要同一账号的密码和锁定文件夹 PIN，仅用于本次操作，不保存。恢复后标为人工保留，防止再次自动锁定。</p><div id="operations" class="operation-list"><p class="empty">还没有锁定操作。</p></div></section>
+</main>
+<dialog id="restoreDialog"><form id="restoreForm"><h2>恢复照片及相册关系</h2><p>照片会恢复至锁定前的时间线或归档；恢复到共享相册后，该相册成员也能再次看到它。</p><label>Immich 邮箱<input id="restoreEmail" type="email" required autocomplete="off"></label><label>Immich 密码<input id="restorePassword" type="password" required autocomplete="off"></label><label>锁定文件夹 PIN<input id="restorePin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="off"></label><div class="actions"><button type="submit">验证并恢复</button><button type="button" id="cancelRestore" class="secondary">取消</button></div></form></dialog>
+<footer>immich-nsfw-identify · Falconsai NSFW · CPU 本地推理 · 审核页面仅本机访问</footer>
+</body></html>
