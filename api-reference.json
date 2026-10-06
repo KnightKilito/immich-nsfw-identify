@@ -1,0 +1,1327 @@
+{
+  "info": {
+    "title": "Immich",
+    "description": "Immich API",
+    "version": "3.3.0-rc.0",
+    "contact": {}
+  },
+  "operations": [
+    {
+      "path": "/albums",
+      "method": "get",
+      "description": "Retrieve a list of albums available to the authenticated user.",
+      "operationId": "getAllAlbums",
+      "parameters": [
+        {
+          "name": "assetId",
+          "required": false,
+          "in": "query",
+          "description": "Filter albums containing this asset ID (ignores other parameters)",
+          "schema": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          }
+        },
+        {
+          "name": "id",
+          "required": false,
+          "in": "query",
+          "description": "Album ID",
+          "schema": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          }
+        },
+        {
+          "name": "isOwned",
+          "required": false,
+          "in": "query",
+          "description": "Filter by ownership: true = only owned, false = only shared-with-me, undefined = no filter",
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        {
+          "name": "isShared",
+          "required": false,
+          "in": "query",
+          "description": "Filter by shared status: true = only shared, false = not shared, undefined = no filter",
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        {
+          "name": "name",
+          "required": false,
+          "in": "query",
+          "description": "Album name (exact match)",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/AlbumResponseDto"
+                },
+                "type": "array"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "List all albums",
+      "tags": [
+        "Albums"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-permission": "album.read",
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/albums/{id}",
+      "method": "get",
+      "description": "Retrieve information about a specific album by its ID.",
+      "operationId": "getAlbumInfo",
+      "parameters": [
+        {
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "schema": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          }
+        },
+        {
+          "name": "key",
+          "required": false,
+          "in": "query",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "slug",
+          "required": false,
+          "in": "query",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlbumResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Retrieve an album",
+      "tags": [
+        "Albums"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-permission": "album.read",
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/albums/{id}/assets",
+      "method": "put",
+      "description": "Add multiple assets to a specific album by its ID.",
+      "operationId": "addAssetsToAlbum",
+      "parameters": [
+        {
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "schema": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/BulkIdsDto"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/BulkIdResponseDto"
+                },
+                "type": "array"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Add assets to an album",
+      "tags": [
+        "Albums"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-permission": "albumAsset.create",
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/assets",
+      "method": "put",
+      "deprecated": true,
+      "description": "Updates multiple assets at the same time.",
+      "operationId": "updateAssets",
+      "parameters": [],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AssetBulkUpdateDto"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "204": {
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Update assets",
+      "tags": [
+        "Assets",
+        "Deprecated"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        },
+        {
+          "version": "v3",
+          "state": "Deprecated",
+          "replacementId": "updateAssets"
+        }
+      ],
+      "x-immich-permission": "asset.update",
+      "x-immich-state": "Deprecated"
+    },
+    {
+      "path": "/assets/{id}",
+      "method": "get",
+      "description": "Retrieve detailed information about a specific asset.",
+      "operationId": "getAssetInfo",
+      "parameters": [
+        {
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "schema": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          }
+        },
+        {
+          "name": "key",
+          "required": false,
+          "in": "query",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "slug",
+          "required": false,
+          "in": "query",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Retrieve an asset",
+      "tags": [
+        "Assets"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-permission": "asset.read",
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/auth/login",
+      "method": "post",
+      "description": "Login with username and password and receive a session token.",
+      "operationId": "login",
+      "parameters": [],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LoginCredentialDto"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "201": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "summary": "Login",
+      "tags": [
+        "Authentication"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/auth/logout",
+      "method": "post",
+      "description": "Logout the current user and invalidate the session token.",
+      "operationId": "logout",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Logout",
+      "tags": [
+        "Authentication"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/auth/pin-code",
+      "method": "post",
+      "description": "Setup a new pin code for the current user.",
+      "operationId": "setupPinCode",
+      "parameters": [],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PinCodeSetupDto"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "204": {
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Setup pin code",
+      "tags": [
+        "Authentication"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-permission": "pinCode.create",
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/auth/session/lock",
+      "method": "post",
+      "description": "Remove elevated access to locked assets from the current session.",
+      "operationId": "lockAuthSession",
+      "parameters": [],
+      "responses": {
+        "204": {
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Lock auth session",
+      "tags": [
+        "Authentication"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/auth/session/unlock",
+      "method": "post",
+      "description": "Temporarily grant the session elevated access to locked assets by providing the correct PIN code.",
+      "operationId": "unlockAuthSession",
+      "parameters": [],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SessionUnlockDto"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "204": {
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Unlock auth session",
+      "tags": [
+        "Authentication"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/auth/status",
+      "method": "get",
+      "description": "Get information about the current session, including whether the user has a password, and if the session can access locked assets.",
+      "operationId": "getAuthStatus",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthStatusResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Retrieve auth status",
+      "tags": [
+        "Authentication"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/server/version",
+      "method": "get",
+      "description": "Retrieve the current server version in semantic versioning (semver) format.",
+      "operationId": "getServerVersion",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServerVersionResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "summary": "Get server version",
+      "tags": [
+        "Server"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-state": "Stable"
+    },
+    {
+      "path": "/users/me",
+      "method": "get",
+      "description": "Retrieve information about the user making the API request.",
+      "operationId": "getMyUser",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminResponseDto"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "security": [
+        {
+          "bearer": []
+        },
+        {
+          "cookie": []
+        },
+        {
+          "api_key": []
+        }
+      ],
+      "summary": "Get current user",
+      "tags": [
+        "Users"
+      ],
+      "x-immich-history": [
+        {
+          "version": "v1",
+          "state": "Added"
+        },
+        {
+          "version": "v1",
+          "state": "Beta"
+        },
+        {
+          "version": "v2",
+          "state": "Stable"
+        }
+      ],
+      "x-immich-permission": "user.read",
+      "x-immich-state": "Stable"
+    }
+  ],
+  "schemas": {
+    "AlbumResponseDto": {
+      "properties": {
+        "albumName": {
+          "description": "Album name",
+          "type": "string"
+        },
+        "albumThumbnailAssetId": {
+          "description": "Thumbnail asset ID",
+          "format": "uuid",
+          "nullable": true,
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+          "type": "string"
+        },
+        "albumUsers": {
+          "description": "First entry is always the album owner. Second entry is the auth user, if it differs from the owner. The rest are ordered alphabetically.",
+          "items": {
+            "$ref": "#/components/schemas/AlbumUserResponseDto"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "assetCount": {
+          "description": "Number of assets",
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "contributorCounts": {
+          "items": {
+            "$ref": "#/components/schemas/ContributorCountResponseDto"
+          },
+          "type": "array"
+        },
+        "createdAt": {
+          "description": "Creation date",
+          "format": "date-time",
+          "type": "string"
+        },
+        "description": {
+          "description": "Album description",
+          "type": "string",
+          "x-immich-history": [
+            {
+              "version": "v1",
+              "state": "Added"
+            },
+            {
+              "version": "v3",
+              "state": "Updated",
+              "description": "An empty string is returned instead of null for backwards compatibility; null will be returned in v4."
+            }
+          ]
+        },
+        "endDate": {
+          "description": "UTC representation of (local) end date (latest asset)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "hasSharedLink": {
+          "description": "Has shared link",
+          "type": "boolean"
+        },
+        "id": {
+          "description": "Album ID",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+          "type": "string"
+        },
+        "isActivityEnabled": {
+          "description": "Activity feed enabled",
+          "type": "boolean"
+        },
+        "lastModifiedAssetTimestamp": {
+          "description": "Last modified asset timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/components/schemas/AssetOrder"
+        },
+        "shared": {
+          "description": "Is shared album",
+          "type": "boolean"
+        },
+        "startDate": {
+          "description": "UTC representation of (local) start date (earliest asset)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "Last update date",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "albumName",
+        "albumThumbnailAssetId",
+        "albumUsers",
+        "assetCount",
+        "createdAt",
+        "description",
+        "hasSharedLink",
+        "id",
+        "isActivityEnabled",
+        "shared",
+        "updatedAt"
+      ],
+      "type": "object"
+    },
+    "AssetBulkUpdateDto": {
+      "properties": {
+        "dateTimeOriginal": {
+          "description": "Original date and time",
+          "type": "string"
+        },
+        "dateTimeRelative": {
+          "description": "Relative time offset in minutes",
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "description": {
+          "description": "Asset description",
+          "type": "string"
+        },
+        "duplicateId": {
+          "description": "Duplicate ID",
+          "nullable": true,
+          "type": "string"
+        },
+        "ids": {
+          "description": "Asset IDs to update",
+          "items": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "isFavorite": {
+          "description": "Mark as favorite",
+          "type": "boolean"
+        },
+        "latitude": {
+          "description": "Latitude coordinate",
+          "format": "double",
+          "maximum": 90,
+          "minimum": -90,
+          "type": "number"
+        },
+        "longitude": {
+          "description": "Longitude coordinate",
+          "format": "double",
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        },
+        "rating": {
+          "description": "Rating in range [1-5] (starred), -1 (rejected), or null (unrated)",
+          "maximum": 5,
+          "minimum": -1,
+          "nullable": true,
+          "type": "integer",
+          "x-immich-history": [
+            {
+              "version": "v1",
+              "state": "Added"
+            },
+            {
+              "version": "v2",
+              "state": "Stable"
+            },
+            {
+              "version": "v3",
+              "state": "Updated",
+              "description": "Using 0 as a rating is no longer valid."
+            }
+          ],
+          "x-immich-state": "Stable"
+        },
+        "timeZone": {
+          "description": "Time zone (IANA timezone)",
+          "type": "string"
+        },
+        "visibility": {
+          "$ref": "#/components/schemas/AssetVisibility"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "type": "object"
+    },
+    "AssetResponseDto": {
+      "properties": {
+        "checksum": {
+          "description": "Base64 encoded SHA1 hash",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "The UTC timestamp when the asset was originally uploaded to Immich.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "duplicateId": {
+          "description": "Duplicate group ID",
+          "format": "uuid",
+          "nullable": true,
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+          "type": "string"
+        },
+        "duration": {
+          "description": "Video/gif duration in milliseconds (null for static images)",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "nullable": true,
+          "type": "integer"
+        },
+        "exifInfo": {
+          "$ref": "#/components/schemas/ExifResponseDto"
+        },
+        "fileCreatedAt": {
+          "description": "The actual UTC timestamp when the file was created/captured, preserving timezone information. This is the authoritative timestamp for chronological sorting within timeline groups. Combined with timezone data, this can be used to determine the exact moment the photo was taken.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "fileModifiedAt": {
+          "description": "The UTC timestamp when the file was last modified on the filesystem. This reflects the last time the physical file was changed, which may be different from when the photo was originally taken.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "hasMetadata": {
+          "description": "Whether asset has metadata",
+          "type": "boolean"
+        },
+        "height": {
+          "description": "Asset height",
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "nullable": true,
+          "type": "integer"
+        },
+        "id": {
+          "description": "Asset ID",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+          "type": "string"
+        },
+        "isArchived": {
+          "description": "Is archived",
+          "type": "boolean"
+        },
+        "isEdited": {
+          "description": "Is edited",
+          "type": "boolean",
+          "x-immich-history": [
+            {
+              "version": "v2.5.0",
+              "state": "Added"
+            },
+            {
+              "version": "v2.5.0",
+              "state": "Beta"
+            }
+          ],
+          "x-immich-state": "Beta"
+        },
+        "isFavorite": {
+          "description": "Is favorite",
+          "type": "boolean"
+        },
+        "isOffline": {
+          "description": "Is offline",
+          "type": "boolean"
+        },
+        "isTrashed": {
+          "description": "Is trashed",
+          "type": "boolean"
+        },
+        "libraryId": {
+          "description": "Library ID",
+          "format": "uuid",
+          "nullable": true,
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+          "type": "string",
+          "x-immich-history": [
+            {
+              "version": "v1",
+              "state": "Added"
+            },
+            {
+              "version": "v1",
+              "state": "Deprecated"
+            }
+          ],
+          "x-immich-state": "Deprecated"
+        },
+        "livePhotoVideoId": {
+          "description": "Live photo video ID",
+          "nullable": true,
+          "type": "string"
+        },
+        "localDateTime": {
+          "description": "The local date and time when the photo/video was taken, derived from EXIF metadata. This represents the photographer's local time regardless of timezone, stored as a timezone-agnostic timestamp. Used for timeline grouping by \"local\" days and months.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "originalFileName": {
+          "description": "Original file name",
+          "type": "string"
+        },
+        "originalMimeType": {
+          "description": "Original MIME type",
+          "type": "string"
+        },
+        "originalPath": {
+          "description": "Original file path",
+          "type": "string"
+        },
+        "owner": {
+          "$ref": "#/components/schemas/UserResponseDto"
+        },
+        "ownerId": {
+          "description": "Owner user ID",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+          "type": "string"
+        },
+        "people": {
+          "items": {
+            "$ref": "#/components/schemas/PersonResponseDto"
+          },
+          "type": "array"
+        },
+        "resized": {
+          "description": "Is resized",
+          "type": "boolean",
+          "x-immich-history": [
+            {
+              "version": "v1",
+              "state": "Added"
+            },
+            {
+              "version": "v1.113.0",
+              "state": "Deprecated"
+            }
+          ],
+          "x-immich-state": "Deprecated"
+        },
+        "stack": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AssetStackResponseDto"
+            }
+          ],
+          "nullable": true
+        },
+        "tags": {
+          "items": {
+            "$ref": "#/components/schemas/TagResponseDto"
+          },
+          "type": "array"
+        },
+        "thumbhash": {
+          "description": "Thumbhash for thumbnail generation (base64) also used as the c query param for thumbnail cache busting.",
+          "nullable": true,
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/components/schemas/AssetTypeEnum"
+        },
+        "updatedAt": {
+          "description": "The UTC timestamp when the asset record was last updated in the database. This is automatically maintained by the database and reflects when any field in the asset was last modified.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "visibility": {
+          "$ref": "#/components/schemas/AssetVisibility"
+        },
+        "width": {
+          "description": "Asset width",
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "nullable": true,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "checksum",
+        "createdAt",
+        "duration",
+        "fileCreatedAt",
+        "fileModifiedAt",
+        "hasMetadata",
+        "height",
+        "id",
+        "isArchived",
+        "isEdited",
+        "isFavorite",
+        "isOffline",
+        "isTrashed",
+        "localDateTime",
+        "originalFileName",
+        "originalPath",
+        "ownerId",
+        "thumbhash",
+        "type",
+        "updatedAt",
+        "visibility",
+        "width"
+      ],
+      "type": "object"
+    },
+    "AssetVisibility": {
+      "description": "Asset visibility",
+      "enum": [
+        "archive",
+        "timeline",
+        "hidden",
+        "locked"
+      ],
+      "type": "string"
+    },
+    "BulkIdsDto": {
+      "properties": {
+        "ids": {
+          "description": "IDs to process",
+          "items": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "type": "object"
+    },
+    "LoginCredentialDto": {
+      "properties": {
+        "email": {
+          "description": "User email",
+          "example": "testuser@email.com",
+          "format": "email",
+          "pattern": "^[\\p{L}\\p{M}\\p{N}.!#$%&'*+/=?^_`{|}~-]+@[\\p{L}\\p{N}](?:[\\p{L}\\p{M}\\p{N}-]{0,61}[\\p{L}\\p{M}\\p{N}])?(?:\\.[\\p{L}\\p{N}](?:[\\p{L}\\p{M}\\p{N}-]{0,61}[\\p{L}\\p{M}\\p{N}])?)*$",
+          "type": "string"
+        },
+        "password": {
+          "description": "User password",
+          "example": "password",
+          "type": "string"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ],
+      "type": "object"
+    },
+    "PinCodeChangeDto": {
+      "properties": {
+        "newPinCode": {
+          "description": "New PIN code (4-6 digits)",
+          "pattern": "^\\d{6}$",
+          "type": "string"
+        },
+        "password": {
+          "description": "User password (required if PIN code is not provided)",
+          "example": "password",
+          "type": "string"
+        },
+        "pinCode": {
+          "description": "New PIN code (4-6 digits)",
+          "example": "123456",
+          "pattern": "^\\d{6}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "newPinCode"
+      ],
+      "type": "object"
+    },
+    "PinCodeResetDto": {
+      "properties": {
+        "password": {
+          "description": "User password (required if PIN code is not provided)",
+          "example": "password",
+          "type": "string"
+        },
+        "pinCode": {
+          "description": "New PIN code (4-6 digits)",
+          "example": "123456",
+          "pattern": "^\\d{6}$",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PinCodeSetupDto": {
+      "properties": {
+        "pinCode": {
+          "description": "PIN code (4-6 digits)",
+          "example": "123456",
+          "pattern": "^\\d{6}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pinCode"
+      ],
+      "type": "object"
+    },
+    "SearchResponseDto": {
+      "properties": {
+        "albums": {
+          "$ref": "#/components/schemas/SearchAlbumResponseDto"
+        },
+        "assets": {
+          "$ref": "#/components/schemas/SearchAssetResponseDto"
+        }
+      },
+      "required": [
+        "albums",
+        "assets"
+      ],
+      "type": "object"
+    },
+    "ServerPingResponse": {
+      "properties": {
+        "res": {
+          "example": "pong",
+          "type": "string"
+        }
+      },
+      "required": [
+        "res"
+      ],
+      "type": "object"
+    }
+  }
+}

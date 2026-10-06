@@ -1,0 +1,9 @@
+# Local migration only: preserve the original credentials, results and model cache.
+# This file is intentionally excluded from Git and must not be published.
+volumes:
+  nsfw-state:
+    external: true
+    name: immich-nsfw_nsfw-state
+  nsfw-model:
+    external: true
+    name: immich-nsfw_nsfw-model
